@@ -1,0 +1,44 @@
+version: '3.6'
+
+services:
+
+  traefik:
+    image: traefik:1.6.2-alpine
+    restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./provisioners/docker/config/traefik/traefik.dev.toml:/etc/traefik/traefik.toml
+    networks:
+    - web
+    - back
+    ports:
+    - 80:80
+    - 81:81
+
+  ethvm:
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.default.protocol=http'
+    - 'traefik.frontend.rule=Host:${BASE_DOMAIN}'
+    - 'traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*||Access-Control-Allow-Credentials:true'
+    - 'traefik.frontend.passHostHeader=true'
+    - 'traefik.backend=ethvm'
+    - 'traefik.port=8080'
+
+  server:
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.default.protocol=http'
+    - 'traefik.frontend.rule=Host:ws.${BASE_DOMAIN}'
+    - 'traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:http://${BASE_DOMAIN}||Access-Control-Allow-Credentials:true'
+    - 'traefik.frontend.passHostHeader=true'
+    - 'traefik.backend=server'
+    - 'traefik.port=3000'
+
+  redis:
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.default.protocol=http'
+    - 'traefik.frontend.rule=Host:redis.${BASE_DOMAIN}'
+    - 'traefik.port=6379'
+    - 'traefik.backend=redis'

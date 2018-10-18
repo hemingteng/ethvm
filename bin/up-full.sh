@@ -3,7 +3,11 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR=$(cd ${SCRIPT_DIR}/..; pwd)
 
-DOCKER_COMPOSE="docker-compose -f docker-compose.yml -f docker-compose.extra.yml"
+# source env to get platform specific docker compose command
+. ${SCRIPT_DIR}/env.sh
+
+# append extra to compose files list
+DOCKER_COMPOSE="${DOCKER_COMPOSE} -f ${ROOT_DIR}/docker-compose.processing.yaml"
 
 echo "Starting up containers: traefik, kafka, mongo, ethvm and server"
 CMD="${DOCKER_COMPOSE} up -d --build traefik kafka mongo ethvm server"

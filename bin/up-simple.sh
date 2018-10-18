@@ -3,8 +3,11 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR=$(cd ${SCRIPT_DIR}/..; pwd)
 
+# source env to get platform specific docker compose command
+. ${SCRIPT_DIR}/env.sh
+
 echo "Starting up containers: traefik, mongo, ethvm and server"
-CMD="docker-compose up -d --build traefik mongodb ethvm server"
+CMD="${DOCKER_COMPOSE} up -d --build traefik mongodb ethvm server"
 echo "Executing: ${CMD}"
 ${CMD}
 
@@ -19,6 +22,6 @@ ${CMD}
 echo "Importing bootstraped db to mongo..."
 CMD="mongorestore --db ethvm_local --archive=\"ethvm_sample.archive\""
 echo "Executing: ${CMD}"
-docker-compose exec mongodb sh -c "$CMD"
+${DOCKER_COMPOSE} exec mongodb sh -c "$CMD"
 
 echo "Everything done! Wait for ethvm and server containers to be ready..."

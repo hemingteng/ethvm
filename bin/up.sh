@@ -3,8 +3,11 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR=$(cd ${SCRIPT_DIR}/..; pwd)
 
+# source env to get platform specific docker compose command
+. ${SCRIPT_DIR}/env.sh
+
 echo "Starting up containers: traefik, kafka, mongo, ethvm and server"
-CMD="docker-compose up -d --build"
+CMD="${DOCKER_COMPOSE} up -d --build"
 echo "Executing: ${CMD}"
 ${CMD}
 
